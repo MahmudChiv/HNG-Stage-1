@@ -5,7 +5,7 @@ import crypto from "crypto";
 import strings from "../strings.json";
 import _ from "lodash";
 import { z } from "zod";
-import { count } from "console";
+import { count, error } from "console";
 
 const userSearchSchema = z.object({
   is_palindrome: z.boolean().optional(),
@@ -271,59 +271,95 @@ export const getAllStringsWithFiltering = (req: Request, res: Response) => {
 
 export const filterByNaturalLanguage = (req: Request, res: Response) => {
   try {
-    const { query } = req.query;
-    if (!query || typeof query !== "string") res.sendStatus(400);
+    const raw = req.query.query;
+    if (raw === undefined) return res.status(400).json({ error: "Query is required." });
+
+    const queryStr = Array.isArray(raw) ? raw[0] : raw;
+    if (typeof queryStr !== "string")
+      return res.status(400).json({ error: "Query must be a string." });
+
+    const original = queryStr;
+    const query = _.toLower(queryStr.trim());
 
     let filteredStrings: String[] = [...stringStore.strings];
-    let parsed_filters: string[] = [];
+    const parsed_filters: string[] = [];
 
-    if (
-      (query as string).toLowerCase() === "all single word palindromic strings"
-    ) {
-      filteredStrings = filteredStrings.filter(
-        (str: String) =>
-          str.properties?.is_palindrome === true &&
-          str.properties?.word_count === 1
-      );
-      parsed_filters.push("is_palindrome: true", "word_count: 1");
-    } else if (
-      (query as string).toLowerCase() === "strings longer than 10 characters"
-    ) {
-      filteredStrings = filteredStrings.filter(
-        (str: String) =>
-          str.properties?.length !== undefined && str.properties.length > 10
-      );
-      parsed_filters.push("min_length: 11");
-    } else if (
-      (query as string).toLowerCase() ===
-      "palindromic strings that contain the first vowel"
-    ) {
-      filteredStrings = filteredStrings.filter(
-        (str: String) =>
-          str.properties?.is_palindrome === true &&
-          str.value !== undefined &&
-          str.value.includes("a")
-      );
-      parsed_filters.push("is_palindrome: true", 'contains_character: "a"');
-    } else if (
-      (query as string).toLowerCase() === "strings containing the letter z"
-    ) {
-      filteredStrings = filteredStrings.filter(
-        (str: String) => str.value !== undefined && str.value.includes("z")
-      );
-      parsed_filters.push('contains_character: "z"');
-    } else res.sendStatus(422);
+    switch (query) {
+      case "all single word palindromic strings": {
+        filteredStrings = filteredStrings.filter(
+          (s) =>
+            s.properties?.is_palindrome === true &&
+            (s.properties?.word_count ?? 0) === 1
+        );
+        parsed_filters.push("is_palindrome: true", "word_count: 1");
+        break;
+      }
 
-    res.status(200).json({
+      case "strings longer than 10 characters": {
+        filteredStrings = filteredStrings.filter(
+          (s) => (s.properties?.length ?? 0) > 10
+        );
+        parsed_filters.push("min_length: 11");
+        break;
+      }
+
+      case "palindromic strings that contain the first vowel": {
+        filteredStrings = filteredStrings.filter((s) => {
+          if (s.properties?.is_palindrome !== true || typeof s.value !== "string")
+            return false;
+          return s.value.toLowerCase().includes("a"); // "first vowel" interpreted as 'a'
+        });
+        parsed_filters.push("is_palindrome: true", 'contains_character: "a"');
+        break;
+      }
+
+      case "strings containing the letter z": {
+        filteredStrings = filteredStrings.filter(
+          (s) => typeof s.value === "string" && s.value.toLowerCase().includes("z")
+        );
+        parsed_filters.push('contains_character: "z"');
+        break;
+      }
+
+      default:
+        return res.status(422).json({ error: "Couldn't be parsed" });
+    }
+
+    return res.status(200).json({
       data: filteredStrings,
       count: filteredStrings.length,
       interpreted_query: {
-        original: query,
+        original,
         parsed_filters,
       },
     });
   } catch (error) {
     console.log(error);
-    res.sendStatus(500);
+    return res.status(500).json({ error: "Server error" });
   }
 };
+
+export const deleteString = async (req: Request, res: Response) => {
+  try {
+    const { string } = req.params;
+    if (!string) return res.sendStatus(404);
+    const decodedString = decodeURIComponent(string);
+    const lowerString = _.toLower(decodedString);
+    const existingIndex = stringStore.strings.findIndex(
+      (str) => str.value === lowerString
+    );
+    if (existingIndex === -1) return res.sendStatus(404);
+
+    const deletedString = stringStore.strings[existingIndex];
+    const updatedStrings = [...stringStore.strings];
+    updatedStrings.splice(existingIndex, 1);
+    stringStore.addString(updatedStrings);
+    const filePath = path.join(__dirname, "../strings.json");
+    await fs.writeFile(filePath, JSON.stringify(stringStore.strings, null, 2));
+
+    res.sendStatus(204);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}

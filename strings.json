@@ -63,34 +63,6 @@
     "created_at": "2025-10-22T16:49:30.603Z"
   },
   {
-    "id": "68d0402b6422d837f2a2456d13dfd5aa4ef0fe44dd34f55b8f3bfce311fefbf2",
-    "value": "fountain of knowledge",
-    "properties": {
-      "length": 21,
-      "is_palindrome": false,
-      "unique_characters": 14,
-      "word_count": 3,
-      "sha256_hash": "68d0402b6422d837f2a2456d13dfd5aa4ef0fe44dd34f55b8f3bfce311fefbf2",
-      "character_frequency_map": {
-        "f": 2,
-        "o": 3,
-        "u": 1,
-        "n": 3,
-        "t": 1,
-        "a": 1,
-        "i": 1,
-        " ": 2,
-        "k": 1,
-        "w": 1,
-        "l": 1,
-        "e": 2,
-        "d": 1,
-        "g": 1
-      }
-    },
-    "created_at": "2025-10-22T16:49:48.245Z"
-  },
-  {
     "id": "0c7d337a1546a9a8f555457800a2471d83490ee4c9a219c8c1217ea7c65857f1",
     "value": "software engineering",
     "properties": {
