@@ -1,0 +1,119 @@
+[
+  {
+    "id": "38ac3a838ec2aa4f28228a4b99ca68fd9d587d5bd52f0fc58dd50a608b6a265a",
+    "value": "abaya",
+    "properties": {
+      "length": 5,
+      "is_palindrome": false,
+      "unique_characters": 3,
+      "word_count": 1,
+      "sha256_hash": "38ac3a838ec2aa4f28228a4b99ca68fd9d587d5bd52f0fc58dd50a608b6a265a",
+      "character_frequency_map": {
+        "a": 3,
+        "b": 1,
+        "y": 1
+      }
+    },
+    "created_at": "2025-10-22T14:28:12.868Z"
+  },
+  {
+    "id": "8304ac68eeefb42a25cbb639978f3d0cf5f1ac0585a74c5d85d91d89f9ff5a54",
+    "value": "van parser",
+    "properties": {
+      "length": 10,
+      "is_palindrome": false,
+      "unique_characters": 8,
+      "word_count": 2,
+      "sha256_hash": "8304ac68eeefb42a25cbb639978f3d0cf5f1ac0585a74c5d85d91d89f9ff5a54",
+      "character_frequency_map": {
+        "v": 1,
+        "a": 2,
+        "n": 1,
+        " ": 1,
+        "p": 1,
+        "r": 2,
+        "s": 1,
+        "e": 1
+      }
+    },
+    "created_at": "2025-10-22T16:49:03.514Z"
+  },
+  {
+    "id": "fc7d2fe2f4f22969cc7c148bcde8b9e482c458b318e95f135d01d42a5653759f",
+    "value": "druggled hustler",
+    "properties": {
+      "length": 16,
+      "is_palindrome": false,
+      "unique_characters": 10,
+      "word_count": 2,
+      "sha256_hash": "fc7d2fe2f4f22969cc7c148bcde8b9e482c458b318e95f135d01d42a5653759f",
+      "character_frequency_map": {
+        "d": 2,
+        "r": 2,
+        "u": 2,
+        "g": 2,
+        "l": 2,
+        "e": 2,
+        " ": 1,
+        "h": 1,
+        "s": 1,
+        "t": 1
+      }
+    },
+    "created_at": "2025-10-22T16:49:30.603Z"
+  },
+  {
+    "id": "68d0402b6422d837f2a2456d13dfd5aa4ef0fe44dd34f55b8f3bfce311fefbf2",
+    "value": "fountain of knowledge",
+    "properties": {
+      "length": 21,
+      "is_palindrome": false,
+      "unique_characters": 14,
+      "word_count": 3,
+      "sha256_hash": "68d0402b6422d837f2a2456d13dfd5aa4ef0fe44dd34f55b8f3bfce311fefbf2",
+      "character_frequency_map": {
+        "f": 2,
+        "o": 3,
+        "u": 1,
+        "n": 3,
+        "t": 1,
+        "a": 1,
+        "i": 1,
+        " ": 2,
+        "k": 1,
+        "w": 1,
+        "l": 1,
+        "e": 2,
+        "d": 1,
+        "g": 1
+      }
+    },
+    "created_at": "2025-10-22T16:49:48.245Z"
+  },
+  {
+    "id": "0c7d337a1546a9a8f555457800a2471d83490ee4c9a219c8c1217ea7c65857f1",
+    "value": "software engineering",
+    "properties": {
+      "length": 20,
+      "is_palindrome": false,
+      "unique_characters": 12,
+      "word_count": 2,
+      "sha256_hash": "0c7d337a1546a9a8f555457800a2471d83490ee4c9a219c8c1217ea7c65857f1",
+      "character_frequency_map": {
+        "s": 1,
+        "o": 1,
+        "f": 1,
+        "t": 1,
+        "w": 1,
+        "a": 1,
+        "r": 2,
+        "e": 4,
+        " ": 1,
+        "n": 3,
+        "g": 2,
+        "i": 2
+      }
+    },
+    "created_at": "2025-10-22T21:31:46.457Z"
+  }
+]
