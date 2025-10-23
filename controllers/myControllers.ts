@@ -41,10 +41,11 @@ const stringStore = {
 export const addString = (req: Request, res: Response) => {
   try {
     let { value } = req.body;
-    value = _.toLower(value);
-    if (!value) return res.status(400).json({ error: "Value is required." });
+    if (value === undefined || value === null)
+      return res.status(400).json({ error: "Value is required." });
     if (typeof value !== "string")
       return res.status(422).json({ error: "Value must be a string." });
+    value = _.toLower(value);
 
     if (stringStore.strings.find((str) => str.value === value)) {
       return res.status(409).json({ error: "String already exists." });
@@ -84,7 +85,7 @@ export const addString = (req: Request, res: Response) => {
     const filePath = path.join(__dirname, "../strings.json");
     fs.writeFile(filePath, JSON.stringify(stringStore.strings, null, 2));
 
-    return res.status(200).json({
+    return res.status(201).json({
       id: sha256_hash,
       value,
       properties: {
@@ -107,7 +108,7 @@ export const getString = (req: Request, res: Response) => {
     let { string } = req.params;
     string = _.toLower(string);
     const foundString = stringStore.strings.find((str) => str.value === string);
-    if (!foundString) return res.sendStatus(404);
+    if (!foundString) return res.status(404).json({ error: "String not found." });
 
     return res.status(200).json({
       id: foundString?.id,
@@ -117,7 +118,7 @@ export const getString = (req: Request, res: Response) => {
     });
   } catch (error) {
     console.log(error);
-    return res.sendStatus(500);
+    return res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -265,7 +266,7 @@ export const getAllStringsWithFiltering = (req: Request, res: Response) => {
     });
   } catch (error) {
     console.log(error);
-    return res.sendStatus(500);
+    return res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -375,6 +376,6 @@ export const deleteString = async (req: Request, res: Response) => {
     return res.sendStatus(204);
   } catch (error) {
     console.log(error);
-    return res.sendStatus(500);
+    return res.status(500).json({ error: "Server error" });
   }
 }
