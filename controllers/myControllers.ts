@@ -42,7 +42,7 @@ export const addString = (req: Request, res: Response) => {
   try {
     let { value } = req.body;
     value = _.toLower(value);
-    if (!value) res.status(400).json({ error: "Value is required." });
+    if (!value) return res.status(400).json({ error: "Value is required." });
     if (typeof value !== "string")
       return res.status(422).json({ error: "Value must be a string." });
 
@@ -84,7 +84,7 @@ export const addString = (req: Request, res: Response) => {
     const filePath = path.join(__dirname, "../strings.json");
     fs.writeFile(filePath, JSON.stringify(stringStore.strings, null, 2));
 
-    res.status(200).json({
+    return res.status(200).json({
       id: sha256_hash,
       value,
       properties: {
@@ -98,7 +98,7 @@ export const addString = (req: Request, res: Response) => {
       created_at,
     });
   } catch (error) {
-    res.status(500).json({ error });
+    return res.status(500).json({ error });
   }
 };
 
@@ -107,9 +107,9 @@ export const getString = (req: Request, res: Response) => {
     let { string } = req.params;
     string = _.toLower(string);
     const foundString = stringStore.strings.find((str) => str.value === string);
-    if (!foundString) res.sendStatus(404);
+    if (!foundString) return res.sendStatus(404);
 
-    res.status(200).json({
+    return res.status(200).json({
       id: foundString?.id,
       value: string,
       properties: foundString?.properties,
@@ -117,7 +117,7 @@ export const getString = (req: Request, res: Response) => {
     });
   } catch (error) {
     console.log(error);
-    res.sendStatus(500);
+    return res.sendStatus(500);
   }
 };
 
@@ -258,20 +258,24 @@ export const getAllStringsWithFiltering = (req: Request, res: Response) => {
     }
 
     // Always return 200 even if no filters provided or no results found
-    res.status(200).json({
+    return res.status(200).json({
       data: filteredStrings,
       count: filteredStrings.length,
       filters_applied: appliedFilters,
     });
   } catch (error) {
     console.log(error);
-    res.sendStatus(500);
+    return res.sendStatus(500);
   }
 };
 
 export const filterByNaturalLanguage = (req: Request, res: Response) => {
   try {
-    const raw = req.query.query;
+    // Accept query from multiple places to avoid route mismatch (query param `query` or `q`, or path param)
+    const raw =
+      (req.query && (req.query.query ?? req.query.q)) ??
+      (req.params && (req.params.query ?? req.params.string));
+
     if (raw === undefined) return res.status(400).json({ error: "Query is required." });
 
     const queryStr = Array.isArray(raw) ? raw[0] : raw;
@@ -322,7 +326,18 @@ export const filterByNaturalLanguage = (req: Request, res: Response) => {
       }
 
       default:
-        return res.status(422).json({ error: "Couldn't be parsed" });
+        // Instead of returning a parsing error that might be swallowed by route ordering,
+        // return an explicit 200 with an empty result and an explanatory message so the caller
+        // sees that the natural language parser ran but couldn't interpret the query.
+        return res.status(200).json({
+          data: [],
+          count: 0,
+          interpreted_query: {
+            original,
+            parsed_filters: [],
+          },
+          message: "Could not parse natural language query",
+        });
     }
 
     return res.status(200).json({
@@ -357,9 +372,9 @@ export const deleteString = async (req: Request, res: Response) => {
     const filePath = path.join(__dirname, "../strings.json");
     await fs.writeFile(filePath, JSON.stringify(stringStore.strings, null, 2));
 
-    res.sendStatus(204);
+    return res.sendStatus(204);
   } catch (error) {
     console.log(error);
-    res.sendStatus(500);
+    return res.sendStatus(500);
   }
 }
